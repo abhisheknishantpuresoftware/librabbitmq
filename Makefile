@@ -57,8 +57,14 @@ $(RABBIT_TARGET):
 
 dist: rabbitmq-c $(RABBIT_TARGET)
 
-manylinux1: dist
+manylinux1: dist manylinuxaarch64
 	 docker run --rm -v `pwd`:/workspace:z quay.io/pypa/manylinux1_x86_64  /workspace/build-manylinux1-wheels.sh
+
+qemu-user-static:
+	docker run --rm --privileged hypriot/qemu-register
+
+manylinuxaarch64: qemu-user-static
+	docker run --rm -v `pwd`:/workspace:z quay.io/pypa/manylinux2014_aarch64  /workspace/build-manylinux1-wheels.sh
 
 rebuild:
 	$(PYTHON) setup.py build
